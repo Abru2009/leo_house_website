@@ -1,4 +1,4 @@
-const LEO_DATA = {
+var LEO_DATA = {
     "teachers": [
         {
             "name": "Mr. Thomas Anderson",

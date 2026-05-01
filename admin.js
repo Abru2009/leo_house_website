@@ -126,8 +126,35 @@ document.addEventListener('DOMContentLoaded', () => {
         if(cList) cList.innerHTML = LEO_DATA.council.map((c, i) => renderProfile(c, 'council', i)).join('');
     }
     
-    // Initial Render
-    renderLists();
+    // Helper to save to Firebase
+    function saveToFirebase() {
+        db.ref('leo_data').set(LEO_DATA).then(() => {
+            console.log('Saved to Firebase successfully.');
+        }).catch(err => {
+            alert('Failed to save to Firebase: ' + err.message);
+        });
+    }
+
+    // --- Firebase Data Sync ---
+    const dbRef = db.ref('leo_data');
+    dbRef.on('value', (snapshot) => {
+        const data = snapshot.val();
+        if (data) {
+            LEO_DATA = data;
+            
+            // Ensure arrays exist even if they were emptied in Firebase
+            if (!LEO_DATA.achievements) LEO_DATA.achievements = [];
+            if (!LEO_DATA.news) LEO_DATA.news = [];
+            if (!LEO_DATA.studentsByClass) LEO_DATA.studentsByClass = [];
+            if (!LEO_DATA.teachers) LEO_DATA.teachers = [];
+            if (!LEO_DATA.council) LEO_DATA.council = [];
+            
+            renderLists();
+        } else {
+            dbRef.set(LEO_DATA);
+            renderLists();
+        }
+    });
 
     // EXPOSE Globals for delete functions on onClick
     window.deleteItem = function(listName, reverseIndex) {
@@ -136,14 +163,14 @@ document.addEventListener('DOMContentLoaded', () => {
         const actualIndex = arr.length - 1 - reverseIndex;
         if(confirm('Are you sure you want to delete this?')) {
             arr.splice(actualIndex, 1);
-            renderLists();
+            saveToFirebase();
         }
     };
 
     window.deleteMember = function(classIndex, studentIndex) {
         if(confirm('Are you sure you want to delete this member?')) {
             LEO_DATA.studentsByClass[classIndex].students.splice(studentIndex, 1);
-            renderLists();
+            saveToFirebase();
         }
     };
 
@@ -193,7 +220,7 @@ document.addEventListener('DOMContentLoaded', () => {
         cropModal.style.display = 'none';
         cropperOptions.cropperInstance.destroy();
         cropperOptions.cropperInstance = null;
-        renderLists();
+        saveToFirebase();
     });
 
     // Handle Crop Cancel
@@ -215,9 +242,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if(!student) return alert("Please select a student.");
 
+        if (!LEO_DATA.achievements) LEO_DATA.achievements = [];
         LEO_DATA.achievements.push({ student, event, position, points });
         e.target.reset();
-        renderLists();
+        saveToFirebase();
     });
 
     // FORM: News
@@ -231,9 +259,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const newNews = { title, date, description };
         if(img) newNews.img = img;
 
+        if (!LEO_DATA.news) LEO_DATA.news = [];
         LEO_DATA.news.push(newNews); 
         e.target.reset();
-        renderLists();
+        saveToFirebase();
     });
 
     // FORM: Add Member
@@ -252,37 +281,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         classGroup.students.push({ name, role });
         e.target.reset();
-        renderLists();
+        saveToFirebase();
     });
 
-    // Generate JSON string
-    function getFileContent() {
-        return `const LEO_DATA = ${JSON.stringify(LEO_DATA, null, 4)};`;
-    }
-
-    // COPY TO CLIPBOARD
-    document.getElementById('copyBtn').addEventListener('click', () => {
-        const text = getFileContent();
-        navigator.clipboard.writeText(text).then(() => {
-            alert("Code Copied! Open 'data.js' in your code editor, Select All, and Paste!");
-        }).catch(err => {
-            alert("Failed to copy. Use the download button instead.");
-        });
-    });
-
-    // EXPORT DOWNLOAD
-    document.getElementById('downloadBtn').addEventListener('click', () => {
-        const fileContent = getFileContent();
-        const blob = new Blob([fileContent], { type: 'text/javascript' });
-        const url = URL.createObjectURL(blob);
-        
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'data.js';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-    });
+    // Export functionality removed since it syncs to Firebase directly.
 
 });

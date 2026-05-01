@@ -100,7 +100,7 @@
             <button class="tab-btn" data-target="admin-news">Post News</button>
             <button class="tab-btn" data-target="admin-members">Manage Members</button>
             <button class="tab-btn" data-target="admin-profiles">Home Profiles</button>
-            <button class="tab-btn" data-target="admin-export">Export Data</button>
+            <button class="tab-btn" data-target="admin-export">Cloud Sync</button>
         </div>
 
         <!-- 1. LEADERBOARD -->
@@ -197,16 +197,13 @@
             <div class="data-list" id="councilProfileList" style="margin-top:0;"></div>
         </section>
 
-        <!-- 5. EXPORT -->
+        <!-- 5. CLOUD SYNC -->
         <section id="admin-export" class="admin-section">
             <div class="export-box">
-                <h2>Save Your Changes</h2>
-                <div style="background: rgba(255,0,0,0.1); padding: 1rem; border-left: 4px solid red; text-align:left; margin-bottom:2rem;">
-                    <strong>CRITICAL INSTRUCTION:</strong> Because your site isn't connected to a database, downloading the file will place it in your <code>Downloads</code> folder, which is why your site isn't updating! 
-                    Instead of downloading, use the <strong>COPY CODE</strong> button below, open your actual <code>data.js</code> file in your code editor, Select All (Cmd+A), and Paste (Cmd+V).
+                <h2>Cloud Sync Active</h2>
+                <div style="background: rgba(0,255,0,0.1); padding: 1rem; border-left: 4px solid #2ecc71; text-align:left; margin-bottom:2rem; color: #e0e0e0;">
+                    <strong>SUCCESS:</strong> Your site is now connected to Firebase! Any changes you make in this dashboard are instantly saved to the database and automatically reflect on the live website. You no longer need to copy/paste code or download data.js manually.
                 </div>
-                <button id="copyBtn" class="btn">1. Copy Code To Clipboard</button>
-                <button id="downloadBtn" class="btn-secondary" style="margin-left:1rem;">2. Download data.js (Alternative)</button>
             </div>
         </section>
 
@@ -229,7 +226,14 @@
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+    
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    
+    <!-- Data & Init -->
     <script src="data.js"></script>
+    <script src="firebase-init.js"></script>
     <script src="admin.js"></script>
 </body>
 </html>
